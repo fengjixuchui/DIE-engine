@@ -41,6 +41,7 @@ GuiMainWindow::GuiMainWindow(QWidget *pParent)
     listIDs.append(XOptions::ID_STAYONTOP);
     listIDs.append(XOptions::ID_SCANAFTEROPEN);
     listIDs.append(XOptions::ID_SAVELASTDIRECTORY);
+    listIDs.append(XOptions::ID_SINGLEAPPLICATION);
     listIDs.append(XOptions::ID_LASTDIRECTORY);
     listIDs.append(XOptions::ID_SAVEBACKUP);
     listIDs.append(XOptions::ID_DBPATH);
@@ -56,7 +57,7 @@ GuiMainWindow::GuiMainWindow(QWidget *pParent)
     {
         QString sFileName=QCoreApplication::arguments().at(1);
 
-        processFile(sFileName,true);
+        processFile(sFileName);
     }
 }
 
@@ -120,10 +121,10 @@ void GuiMainWindow::on_pushButtonHex_clicked()
 
         if(XBinary::tryToOpen(&file))
         {
-            QHexView::OPTIONS hexOptions={};
-            hexOptions.sBackupFileName=XBinary::getBackupName(&file);
+            XHexView::OPTIONS hexOptions={};
+//            hexOptions.sBackupFileName=XBinary::getBackupName(&file);
 
-            DialogHex dialogHex(this,&file,&hexOptions);
+            DialogHexView dialogHex(this,&file,hexOptions);
 
             dialogHex.exec();
 
@@ -223,10 +224,10 @@ void GuiMainWindow::adjustFile()
     xOptions.setLastDirectory(sFileName);
 }
 
-void GuiMainWindow::processFile(QString sFileName, bool bScan)
+void GuiMainWindow::processFile(QString sFileName)
 {
     ui->lineEditFileName->setText(sFileName);
-    ui->widgetFormats->setData(sFileName,bScan);
+    ui->widgetFormats->setData(sFileName,xOptions.isScanAfterOpen());
 
     adjustFile();
 }
@@ -255,10 +256,7 @@ void GuiMainWindow::dropEvent(QDropEvent *event)
 
             sFileName=XBinary::convertFileName(sFileName);
 
-            if(xOptions.isScanAfterOpen())
-            {
-                processFile(sFileName,xOptions.isScanAfterOpen());
-            }
+            processFile(sFileName);
         }
     }
 }
@@ -271,9 +269,6 @@ void GuiMainWindow::on_pushButtonOpenFile_clicked()
 
     if(!sFileName.isEmpty())
     {
-        if(xOptions.isScanAfterOpen())
-        {
-            processFile(sFileName,xOptions.isScanAfterOpen());
-        }
+        processFile(sFileName);
     }
 }

@@ -38,6 +38,11 @@ include(../build.pri)
     include(../XOptions/xoptions.pri)
 }
 
+!contains(XCONFIG, xsingleapplication) {
+    XCONFIG += xsingleapplication
+    include(../XSingleApplication/xsingleapplication.pri)
+}
+
 RESOURCES += \
     res.qrc
 

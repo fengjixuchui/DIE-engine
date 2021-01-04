@@ -1,4 +1,4 @@
-// Copyright (c) 2020 hors<horsicq@gmail.com>
+// Copyright (c) 2020-2021 hors<horsicq@gmail.com>
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -25,7 +25,7 @@
 #include <QMainWindow>
 #include <QFileDialog>
 #include "dialogmime.h"
-#include "dialoghex.h"
+#include "dialoghexview.h"
 #include "dialogentropy.h"
 #include "dialogsearchstrings.h"
 #include "dialogmemorymap.h"
@@ -61,7 +61,8 @@ private slots:
     void adjust();
     void adjustFile();
 
-    void processFile(QString sFileName, bool bScan);
+public slots:
+    void processFile(QString sFileName);
 
 protected:
     void dragEnterEvent(QDragEnterEvent *event) override;
