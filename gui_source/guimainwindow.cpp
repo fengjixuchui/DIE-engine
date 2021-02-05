@@ -1,4 +1,4 @@
-// Copyright (c) 2020 hors<horsicq@gmail.com>
+// Copyright (c) 2020-2021 hors<horsicq@gmail.com>
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -33,23 +33,31 @@ GuiMainWindow::GuiMainWindow(QWidget *pParent)
 
     xOptions.setName(X_OPTIONSFILE);
 
-    QList<XOptions::ID> listIDs;
+    QList<XOptions::ID> listOptionsIDs;
 
-    listIDs.append(XOptions::ID_STYLE);
-    listIDs.append(XOptions::ID_QSS);
-    listIDs.append(XOptions::ID_LANG);
-    listIDs.append(XOptions::ID_STAYONTOP);
-    listIDs.append(XOptions::ID_SCANAFTEROPEN);
-    listIDs.append(XOptions::ID_SAVELASTDIRECTORY);
-    listIDs.append(XOptions::ID_SINGLEAPPLICATION);
-    listIDs.append(XOptions::ID_LASTDIRECTORY);
-    listIDs.append(XOptions::ID_SAVEBACKUP);
-    listIDs.append(XOptions::ID_DBPATH);
-    listIDs.append(XOptions::ID_INFOPATH);
-    listIDs.append(XOptions::ID_SCANENGINE);
+    listOptionsIDs.append(XOptions::ID_STYLE);
+    listOptionsIDs.append(XOptions::ID_QSS);
+    listOptionsIDs.append(XOptions::ID_LANG);
+    listOptionsIDs.append(XOptions::ID_STAYONTOP);
+    listOptionsIDs.append(XOptions::ID_SCANAFTEROPEN);
+    listOptionsIDs.append(XOptions::ID_SAVELASTDIRECTORY);
+    listOptionsIDs.append(XOptions::ID_SINGLEAPPLICATION);
+    listOptionsIDs.append(XOptions::ID_LASTDIRECTORY);
+    listOptionsIDs.append(XOptions::ID_SAVEBACKUP);
+    listOptionsIDs.append(XOptions::ID_DBPATH);
+    listOptionsIDs.append(XOptions::ID_INFOPATH);
+    listOptionsIDs.append(XOptions::ID_SCANENGINE);
 
-    xOptions.setValueIDs(listIDs);
+    xOptions.setValueIDs(listOptionsIDs);
     xOptions.load();
+
+    xShortcuts.setName(X_SHORTCUTSFILE);
+
+    xShortcuts.addGroup(XShortcuts::ID_STRINGS);
+    xShortcuts.addGroup(XShortcuts::ID_HEX);
+    xShortcuts.addGroup(XShortcuts::ID_DISASM);
+    xShortcuts.addGroup(XShortcuts::ID_ARCHIVE);
+    xShortcuts.load();
 
     adjust();
 
@@ -64,6 +72,7 @@ GuiMainWindow::GuiMainWindow(QWidget *pParent)
 GuiMainWindow::~GuiMainWindow()
 {
     xOptions.save();
+    xShortcuts.save();
 
     delete ui;
 }
@@ -102,6 +111,7 @@ void GuiMainWindow::on_pushButtonMIME_clicked()
         if(XBinary::tryToOpen(&file))
         {
             DialogMIME dialogMIME(this,&file);
+            dialogMIME.setShortcuts(&xShortcuts);
 
             dialogMIME.exec();
 
@@ -125,6 +135,7 @@ void GuiMainWindow::on_pushButtonHex_clicked()
 //            hexOptions.sBackupFileName=XBinary::getBackupName(&file);
 
             DialogHexView dialogHex(this,&file,hexOptions);
+            dialogHex.setShortcuts(&xShortcuts);
 
             dialogHex.exec();
 
@@ -146,6 +157,7 @@ void GuiMainWindow::on_pushButtonStrings_clicked()
         {
             // TODO options
             DialogSearchStrings dialogSearchStrings(this,&file,0,true);
+            dialogSearchStrings.setShortcuts(&xShortcuts);
 
             dialogSearchStrings.exec();
 
@@ -166,6 +178,7 @@ void GuiMainWindow::on_pushButtonEntropy_clicked()
         if(file.open(QIODevice::ReadOnly))
         {
             DialogEntropy dialogEntropy(this,&file);
+            dialogEntropy.setShortcuts(&xShortcuts);
 
             dialogEntropy.exec();
 
@@ -186,6 +199,7 @@ void GuiMainWindow::on_pushButtonHash_clicked()
         if(file.open(QIODevice::ReadOnly))
         {
             DialogHash dialogHash(this,&file);
+            dialogHash.setShortcuts(&xShortcuts);
 
             dialogHash.exec();
 
@@ -206,6 +220,9 @@ void GuiMainWindow::adjust()
     ui->widgetFormats->setDIEDatabasePath(xOptions.getDbPath());
     ui->widgetFormats->setDIEInfoPath(xOptions.getInfoPath());
     ui->widgetFormats->setScanEngine(xOptions.getScanEngine());
+
+    ui->widgetFormats->setShortcuts(&xShortcuts);
+    // TODO setShortcuts for mainWindow ...
 }
 
 void GuiMainWindow::adjustFile()
@@ -275,4 +292,15 @@ void GuiMainWindow::on_pushButtonOpenFile_clicked()
     {
         processFile(sFileName);
     }
+}
+
+void GuiMainWindow::on_pushButtonShortcuts_clicked()
+{
+    DialogShortcuts dialogShortcuts(this);
+
+    dialogShortcuts.setData(&xShortcuts);
+
+    dialogShortcuts.exec();
+
+    adjust();
 }
